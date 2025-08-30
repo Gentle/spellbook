@@ -753,9 +753,13 @@ struct Lines<'text> {
 impl<'text> Lines<'text> {
     fn new(text: &'text str, source: ParseDictionaryErrorSource) -> Self {
         let mut lines = text.lines().enumerate().peekable();
+        while lines
+            .next_if(|(_line_no, line)| line.trim_start().starts_with('#'))
+            .is_some()
+        {}
         let words = lines.peek().map(|(_line_no, line)| {
             line.split_whitespace()
-                .take_while((|word| !word.starts_with('#')) as for<'b, 'c> fn(&'b &'c str) -> bool)
+                .take_while((|word| *word != "#") as for<'b, 'c> fn(&'b &'c str) -> bool)
         });
 
         Self {
@@ -771,9 +775,14 @@ impl<'text> Lines<'text> {
 
     fn advance_line(&mut self) {
         self.lines.next();
+        while self
+            .lines
+            .next_if(|(_line_no, line)| line.trim_start().starts_with('#'))
+            .is_some()
+        {}
         self.words = self.lines.peek().map(|(_line_no, line)| {
             line.split_whitespace()
-                .take_while((|word| !word.starts_with('#')) as for<'b, 'c> fn(&'b &'c str) -> bool)
+                .take_while((|word| *word != "#") as for<'b, 'c> fn(&'b &'c str) -> bool)
         });
     }
 
