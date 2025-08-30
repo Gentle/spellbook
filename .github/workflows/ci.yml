@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - dev
 env:
   MSRV: "1.70"
 jobs:
